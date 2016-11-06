@@ -39,4 +39,16 @@ Troubleshooting some common errors
 
 The downloaded emails are in .eml format. They can be viewed using Windows Live Mail or Windows Mail 10 or any other .eml viewer.
 
+The time limit for receiving data from Google is 30 seconds (which is adjustable). If time exceeds 30 seconds, then the email is saved without attachment.
+
+It is recommended to run the program while keeping the console window open. 
+
 The code has been tested on Chrome Version 54.0.2840.71.
+
+Known errors and solutions:
+
+1. The access token is valid for 1 hour. If the program runs for more than 1 hour, an error will be shown in console window. When this happens refresh and run again. Use the "Continue from page" option and struture your query using label, dates, to, from, subject fields to start where you had left off.
+
+2. Sometimes you may get resource exceeded or quota error. Wheb this happens, refresh and use the guide above to structure your query to start where you had left off.
+
+3. Sometimes you mat get "Aw, Snap" error. Refresh and start again.
