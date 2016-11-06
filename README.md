@@ -27,6 +27,9 @@ Troubleshooting some common errors
                  
 # 2. Google Client ID
 
+Follow instructions given in Step 1 on this page (https://developers.google.com/gmail/api/quickstart/js) to get your google client id. You need to copy that id in backup.php file.
+
+In "Where will you be calling the API from?", choose "Web browser (Javascript)".
 
 # 3. How it works?
 
