@@ -27,18 +27,29 @@ Troubleshooting some common errors
                  
 # 2. Google Client ID
 
-Follow instructions given in Step 1 on this page (https://developers.google.com/gmail/api/quickstart/js) to get your google client id. You need to copy that id in backup.php file.
+1. Login to your GMail account.
+2. Open link -> https://console.developers.google.com/flows/enableapi?apiid=gmail
+3. Select "Create a Project" and continue.
+4. Once GMail API is enabled, click on "Go to credential's".
+5. Click on "client ID". Click "Configure consent screen".
+6. In product name, type "SaveGMailAsEML" and save.
+7. Select Web application.
+8. In "Authorized JavaScript origins", type in "http://localhost" (without quotes).
+9. Click "Create".
+10. Copy your client ID.
 
-In "Where will you be calling the API from?", choose "Web browser (Javascript)".
+# 3. Enable IMAP in GMail.
 
-# 3. How it works?
+# 4. How it works?
 
-1. Download the SaveGMailAsEML folder and save it to www directory of WAMP.
-2. Login using your GMail account.
-3. After initialization, you will find your GMail labels under Labels.
-4. Choose a GMail label and click on Start Back UP.
-5. A folder will be created in SaveGMailAsEML folder with name of your GMail label. Subfolders will be created within that folder for pages and emails without attachments.
-6. Status message appears on webpage when download is complete.
+1. Download the zip file. Extract contents to "www" directory of WAMP. Rename the folder to SaveGMailAsEML.
+2. Go to SaveGMailAsEML folder and open "backup.php" file in Notepad. Find "CLIENT_ID" and replace "your-google-client-id" with your client id obtained in step 2. Save and close.
+3. Open Chrome and type in -> http://localhost/SaveGMailAsEML/backup.php
+4. Click on "Login With GMail". Type in your username and password. If you are already logged in, you will directed to "Request For Permission" page. Click "Allow". You will be directed to app homepage.
+5. After initialization, you will find your GMail labels under Labels.
+6. Choose a GMail label and click on Start Back UP.
+7. A folder will be created in SaveGMailAsEML folder with name of your GMail label. Subfolders will be created within that folder for pages and emails without attachments.
+8. Status message appears on webpage when download is complete.
 
 The downloaded emails are in .eml format. They can be viewed using Windows Live Mail or Windows Mail 10 or any other .eml viewer.
 
