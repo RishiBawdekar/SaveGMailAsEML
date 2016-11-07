@@ -59,8 +59,8 @@ The code has been tested on Chrome Version 54.0.2840.71.
 
 Known errors and solutions:
 
-1. The access token is valid for 1 hour. If the program runs for more than 1 hour, an error will be shown in console window. When this happens refresh and run again. Use the "Continue from page" option and struture your query using label, dates, to, from, subject fields to start where you had left off.
+1. The access token is valid for 1 hour. If the program runs for more than 1 hour, an error will be shown in console window. When this happens refresh and run again. Use the "Continue from page" option and structure your query using label, dates, to, from, subject fields to start where you had left off.
 
-2. Sometimes you may get resource exceeded or quota error. Wheb this happens, refresh and use the guide above to structure your query to start where you had left off.
+2. Sometimes you may get resource exceeded or quota error. When this happens, refresh and use the guide above to structure your query to start where you had left off.
 
 3. Sometimes you mat get "Aw, Snap" error. Refresh and start again.
