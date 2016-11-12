@@ -27,7 +27,7 @@ THE SOFTWARE.
 		 <script language="JavaScript" type="text/javascript" src="base64.js"></script>
 		 <script language="JavaScript" type="text/javascript" src="base64x-1.1.js"></script>
 		 <script language="JavaScript" type="text/javascript" src="Base64Decode.js"></script>
-		 
+	
 		<script type="text/javascript">
 		
 			 var CLIENT_ID = 'your-google-client-id';
@@ -55,6 +55,7 @@ THE SOFTWARE.
 			 var dmsg;
 			 var cpage = 1;
 			 var charLimit = 19; // 0 to 19 -> 20 characters
+			 var foldername;
 			 
 			  /**
 			   * Called when the client library is loaded to start the auth flow.
@@ -77,7 +78,7 @@ THE SOFTWARE.
 				var authButton = document.getElementById('authorizeButton');
 				var outputNotice = document.getElementById('notice');
 				authButton.style.display = 'none';
-				outputNotice.style.display = 'none'; // change style to 'none' in final version
+				outputNotice.style.display = 'none';
 				if (authResult && !authResult.error) {
 				  // Access token has been successfully retrieved, requests can be sent to the API.
 				  gapi.client.load('gmail', 'v1', function() {
@@ -151,13 +152,15 @@ THE SOFTWARE.
 				 {
 					 if ($.trim($("input[type=date]")[i].value).length)
 					 {
+						 //console.log(($("input[type=date]")[i].id));
 						 query += qdate[i] + $("input[type=date]")[i].value + " ";
 					 }
 				 }		 
-				 for (j=0; j < $("input[type=text]").length-1; j++)
+				 for (j=0; j < $("input[type=text]").length-2; j++)
 				 {
 					 if ($.trim($("input[type=text]")[j].value).length)
 					 {
+						 //console.log(($("input[type=text]")[j].id));
 						 query += qtext[j] + $("input[type=text]")[j].value + " ";
 					 }
 				 }
@@ -216,8 +219,8 @@ THE SOFTWARE.
 					  var headers = msg1.payload.headers;
 					  var tdate = new Date(getHeader(headers, 'Date'));
 					  subj = getHeader(headers, 'Subject').replace(/([\[\(] *)?(RE|FWD?) *([-:;)\]][ :;\])-]*|$)|\]+ *$/igm,"");
-					  fileName = GetFileName(tdate, subj);
-					  console.log(messageindex + "-" +fileName);
+					  fileName = GetFileName(tdate, subj, messageindex);
+					  console.log(messageindex + "-" + fileName);
 					  $.ajax
 						 ({
 							 type: 'get',
@@ -288,13 +291,19 @@ THE SOFTWARE.
 			  
 			  function SaveGMail (email, messageindex)
 			  {
+				  var dir = glabel.replace(/[^a-zA-Z0-9_\/s]/gi, ' ').trim();
+				  foldername = document.getElementById("folderid").value;
+				  if ($.trim(foldername).length)
+				  {
+					  dir += "/" + foldername.replace(/[^a-zA-Z0-9_\/s]/gi, ' ').trim();
+				  }
 				  $.ajax
 				 ({
 					 type: 'post',
 					 url: 'save_gmail.php',
 					 data: 
 						{
-							 glabelPHP    : glabel.replace(/[^a-zA-Z0-9]/gi, ' '),
+							 glabelPHP    : dir,
 							 fileNamePHP  : fileName,
 							 emailPHP     : email,
 							 totalmsgPHP  : totalmsg,
@@ -329,13 +338,19 @@ THE SOFTWARE.
 			  function SaveFullGMail(messagedetails, messageindex)
 			  {
 				  woattach++;
+				  var dir = glabel.replace(/[^a-zA-Z0-9_\/s]/gi, ' ').trim();
+				  foldername = document.getElementById("folderid").value;
+				  if ($.trim(foldername).length)
+				  {
+					  dir += "/" + foldername.replace(/[^a-zA-Z0-9_\/s]/gi, ' ').trim();
+				  }
 				  $.ajax
 				 ({
 					 type: 'post',
 					 url:  'savefull_gmail.php',
 					 data: 
 						{
-							 glabelPHP         : glabel.replace(/[^a-zA-Z0-9]/gi, ' '),
+							 glabelPHP         : dir,
 							 fileNamePHP       : fileName,
 							 messagedetailsPHP : JSON.stringify(messagedetails),
 							 woattachPHP       : woattach,
@@ -358,7 +373,11 @@ THE SOFTWARE.
 				  var mType = msgpayload.mimeType;
 				  if (mType == "multipart/alternative")
 				  {
-					  var bdyalt = "--" + getHeader(msgpayload.headers,"Content-Type").split('=')[1];
+					  var bdyalt = "--" + getHeader(msgpayload.headers,"Content-Type").split(';')[1].split('"')[1];
+					  if (bdyalt == "--undefined")
+					  {
+						  bdyalt = "--" + getHeader(msgpayload.headers,"Content-Type").split(';')[1].split('=')[1];
+					  }
 					  var parts = msgpayload.parts;
 					  messagedetails = AppendAltBody(bdyalt, parts, messagedetails);
 				  }
@@ -451,26 +470,29 @@ THE SOFTWARE.
 			 {
 				 for (k1=0; k1 < parts.length; k1++)
 				 {
-					 messagedetails.push(bdyalt + es);
-					 var convertTo = GetTransferEncoding(parts[k1].headers);
-					 messagedetails = AppendHeaderText(parts[k1].headers, messagedetails);
-					 messagedetails.push(es);
-					 if (convertTo == "base64")
+					 if ((parts[k1].mimeType == "text/plain") || (parts[k1].mimeType == "text/html"))
 					 {
-						 messagedetails.push((parts[k1].body.data.replace(/-/g, '+').replace(/_/g, '/')) + es);
-					 } else 
-					 {
-						 try
+						 messagedetails.push(bdyalt + es);
+						 var convertTo = GetTransferEncoding(parts[k1].headers);
+						 messagedetails = AppendHeaderText(parts[k1].headers, messagedetails);
+						 messagedetails.push(es);
+						 if (convertTo == "base64")
 						 {
-							 messagedetails.push(convert(parts[k1].body.data) + es);
-						 }
-						 catch (err)
+							 messagedetails.push((parts[k1].body.data.replace(/-/g, '+').replace(/_/g, '/')) + es);
+						 } else 
 						 {
-							 var tempemail = Base64Decode(parts[k1].body.data);
-							 messagedetails.push(tempemail + es);
+							 try
+							 {
+								 messagedetails.push(convert(parts[k1].body.data) + es);
+							 }
+							 catch (err)
+							 {
+								 var tempemail = Base64Decode(parts[k1].body.data);
+								 messagedetails.push(tempemail + es);
+							 }
 						 }
-					 }
-					 messagedetails.push(es);
+						 messagedetails.push(es);
+						 }
 				 }
 				 messagedetails.push(bdyalt + "--" + es);
 				 messagedetails.push(es);
@@ -546,12 +568,14 @@ THE SOFTWARE.
 				 for (z1=0; z1 < parts.length; z1++)
 				 {
 					 messagedetails.push(bdyrel + es);
+				     //messagedetails.push(es);
 					 var part = parts[z1];
 					 if (part.filename == "")
 					 {
 						 var mType2 = part.mimeType;
 						 if ((mType2 == "text/plain") || (mType2 == "text/html"))
 						 {
+							 //console.log("line 536");
 							 var convertTo = GetTransferEncoding(part.headers);
 							 if (convertTo == "base64")
 							 {
@@ -568,6 +592,7 @@ THE SOFTWARE.
 									 messagedetails.push(tempemail + es);
 								 }
 							 }
+							 //messagedetails.push(convert(part.body.data.replace(/-/g, '+').replace(/_/g, '/')) + es);
 							 messagedetails.push(es);
 						 } else
 						 {
@@ -611,6 +636,7 @@ THE SOFTWARE.
 					<label for="from"> From: <input type="text" name="from" id = "fromid"/></label><br><br/>
 					<label for="to"> To: <input type="text" name="to" id = "toid"/></label><br><br/>
 					<label for="suject"> Subject: <input type="text" name="subject" id = "subjectid"/></label><br><br/>
+					<label for="folder"> Folder name: <input type="text" name="folder" id = "folderid"/></label><br><br/>
 					<label for="continue" id="continueidL"> Continue from page: <input type="text" name="continue" id = "continueid"/></label><br><br/>
 					<button type="button" id="backupbut" onclick="BackUp()">Start Back Up</button><br><br/>
 				</form>
@@ -672,7 +698,7 @@ THE SOFTWARE.
 			display: inline-block;
 			vertical-align: baseline;
 		}
-		input#subjectid, input#fromid, input#toid, input#continueid
+		input#subjectid, input#fromid, input#toid, input#continueid, input#folderid
 		{
 			height: 20px;
 		}
