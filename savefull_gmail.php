@@ -56,11 +56,4 @@ if (isset($_POST['glabelPHP']) && isset($_POST['pagePHP']))
 		}
 	}
 }
-
-
-
-
-
-
-
 ?>
