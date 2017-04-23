@@ -51,7 +51,7 @@ THE SOFTWARE.
 			 var nextpage;
 			 var messageid;
 			 var qdate = ["after: ", "before: "];
-			 var qtext = ["from: ", "to: ", "subject: "];
+			 var qtext = ["from: ", "to: "];
 			 var dmsg;
 			 var cpage = 1;
 			 var charLimit = 19; // 0 to 19 -> 20 characters
@@ -141,13 +141,13 @@ THE SOFTWARE.
 				 glabel = $('#labelsel option:selected').text();
 				 if (glabel == "Select..")
 				 {
-					 alert("Select label.");
-					 $('#labelsel').focus();
-					 return
-				 } 
+					 var query = "";
+				 } else 
+				 {
+					var query = "in:" + glabel + " "; 
+				 }
 				 var afterdate = document.getElementById("afterdate").value;
 				 var beforedate = document.getElementById("beforedate").value;
-				 var query = "in:" + glabel + " ";
 				 for (i=0; i < $("input[type=date]").length; i++)
 				 {
 					 if ($.trim($("input[type=date]")[i].value).length)
@@ -156,13 +156,18 @@ THE SOFTWARE.
 						 query += qdate[i] + $("input[type=date]")[i].value + " ";
 					 }
 				 }		 
-				 for (j=0; j < $("input[type=text]").length-2; j++)
+				 for (j=0; j < $("input[type=text]").length-3; j++)
 				 {
 					 if ($.trim($("input[type=text]")[j].value).length)
 					 {
 						 //console.log(($("input[type=text]")[j].id));
 						 query += qtext[j] + $("input[type=text]")[j].value + " ";
 					 }
+				 }
+				 var subject = document.getElementById('subjectid').value;
+				 if (subject != "")
+				 {
+					 query += "subject: (" + subject + ")";
 				 }
 				 if (nextpage)
 				 {
